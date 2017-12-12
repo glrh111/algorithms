@@ -20,7 +20,7 @@
 符号表API
 
 返回类型 | 方法名 | desc
----|---|---|---
+---|---|---
 |ST()创建一张符号表 |
 void | put(Key key, Value value) | 存入键值对
 Value | get(Key key) | 获取键key对应的值
