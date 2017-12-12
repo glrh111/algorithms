@@ -60,6 +60,11 @@ func (this *Sortable) Exchange(a int, b int) {
 	this.valueList[a], this.valueList[b] = this.valueList[b], this.valueList[a]
 }
 
+// 打乱元素
+func (this *Sortable) Shuffle() {
+
+}
+
 func (this *Sortable) Show() {
 	for _, value := range this.valueList {
 		fmt.Printf("%d ", value.Value())
