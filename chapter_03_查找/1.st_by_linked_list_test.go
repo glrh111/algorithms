@@ -4,104 +4,64 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
-	"testing"
-	"bytes"
-
 	. "github.com/smartystreets/goconvey/convey"
-
-	"time"
+	//"time"
+	"testing"
+	//"fmt"
+	"fmt"
 )
 
-// 获取测试结果。网上公开的。
+// 获取测试结果。网上公开的一些测试用例
 func getTestResult() {
 
 }
 
-
+// SYMBOLTABLEEXAMPLE
+// 012345678901234567
+// SY  O T B   XAMPLE
 func TestSelfInAppEventReportHandler(t *testing.T) {
 
 	Convey("测试post接口", t, func() {
-
-		// 手动启动服务 ./run.sh
-
-		// 构造传输数据
-		var postEvents []InAppEvent
-		var deviceInfo DeviceInfo
-
-		for _, tempEventName := range []string{"k_live", "k_close", "k_click"} {
-			eventValue := map[string]string{"user_id":"wocaocoa", "我草草": "我草拟大爷"}
-			postEvents = append(postEvents, InAppEvent{
-				SessionId:"wocaocoa",
-				DeviceId: "bodao",
-				UserId: "1000",
-				EventKey: tempEventName,
-				EventValue: eventValue,
-				Ctime: string(int64(time.Now().Unix())*1000),
-			})
+		// 首先往里边push数据，看取出来的对不对。
+		var st SymbolTableInterface = NewLinkedList()
+		stMap := map[string]int{
+			"S": 0,
+			"Y": 1,
+			"O": 4,
+			"T": 6,
+			"B": 8,
+			"X": 12,
+			"A": 13,
+			"M": 14,
+			"P": 15,
+			"L": 16,
+			"E": 17,
 		}
-		deviceInfo = DeviceInfo{
-			SessionId: "wocaocoa",
-			// 设备信息
-			DeviceID: "bodao",
-			Platform: "ios",
-			SystemVersion: "10.2.12",
-			SystemModel: "iphone 7",
-			Lang: "thai",
-			// 用户相关信息
-			UserId: "1000",
-			Country: "TH",
-			// 网络信息
-			Operator: "中国移动",
-			Network: "4g",
-			Ipv4: "124.45.251.214",
-			// 软件信息等
-			AppVersion: "57",
-			InstallChannel: "organic",
+		// 插入值
+		for index, value := range "SYMBOLTABLEEXAMPLE" {
+			//fmt.Println("in TestSelfInAppEventReportHandler Put ", index, " ", value)
+			st.Put(NewComparable(string(value)), index)
+		}
+		// 检测
+		for key, value := range stMap {
+			So(st.Get(NewComparable(key)), ShouldEqual, value)
+		}
+		// 检测删除
+		st.Delete(NewComparable("Y"))
+		So(st.Get(NewComparable("Y")), ShouldEqual, nil)
+		// 检测size
+		So(st.Size(), ShouldEqual, 10)
+		// 检测keys
+
+		keyValueList := []string{}
+		for _, key := range st.Keys() {
+			fmt.Println("key, ", key, *key, key.value, key.Value())
+			keyValueList = append(keyValueList, "s")
 		}
 
-		postData := InAppEventData{DeviceInfo:deviceInfo, Events:postEvents}
-
-		// 发送post请求
-		localTestUrl := "http://localhost:9000/v1/data/report"
-		jsonString, jsonErr := json.Marshal(postData)
-		So(jsonErr, ShouldEqual, nil)
-
-		postResult, postErr := http.Post(localTestUrl, "application-json; charset=utf-8", bytes.NewReader(jsonString))
-
-		So(postErr, ShouldEqual, nil)
-		So(postResult, ShouldNotEqual, nil)
-
-		// 验证相关数据在mongo里边的存储情况
-
-		// // 记录条数 event 应该是3条, deviceinfo应该是一条
-
-		eventDocs := make([]InAppEvent, 0)
-		eventDocsReadErr := db.MongoClient.Find(&db.ReportDataBase, &EventCollectionName, &bson.M{}, &eventDocs, true)
-		So(eventDocsReadErr, ShouldEqual, nil)
-		//fmt.Println(eventDocs)
-		So(len(eventDocs), ShouldEqual, len(postEvents))
-
-		// // 看看数据是否能对应上.
-		deviceDocs := make([]DeviceInfo, 0)
-		deviceDocsReadErr := db.MongoClient.Find(&db.ReportDataBase, &DeviceInfoCollectionName, &bson.M{}, &deviceDocs, true)
-		So(deviceDocsReadErr, ShouldEqual, nil)
-		//fmt.Println(deviceDocs)
-		So(len(deviceDocs), ShouldEqual, 1)
-
-		// 查看deviceInfo的数据
-		//So(deviceDocs[0], ShouldEqual, deviceInfo)
-
-		// 删除mongo里边的数据
-		// 有一个bug. 如果convey执行不通过, 这个函数不会执行.
-		Reset(func() {
-
-			for _, collectionName := range []string{DeviceInfoCollectionName, EventCollectionName} {
-				db.MongoClient.DeleteSync(&db.ReportDataBase, &collectionName, &bson.M{})
-			}
-		})
-
+		for index, _ := range stMap {
+			if ("Y" == index) { continue }
+		}
 	})
 
 
