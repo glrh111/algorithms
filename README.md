@@ -1,12 +1,13 @@
 # algorithms
 Algorithms Fourth Edition
 
-## golang 怎样实现类似泛型的功能
+## golang 的类型别名 `type wocao int`
 
-需求：实现一个里边存入一个值，这个值可以比较大小。就是Comparable 对象。
+wocao 不继承 int 的方法，两者的方法互相隔离。
 
-```go
 
-```
+
+
+
 
 
