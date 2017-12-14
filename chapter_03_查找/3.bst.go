@@ -1,13 +1,6 @@
 package main
 
 import (
-	//"fmt"
-	//"bufio"
-	//"strings"
-	//"io"
-	//"os"
-	//"errors"
-	//"unicode"
 	"fmt"
 	"os"
 	"bufio"
@@ -227,4 +220,3 @@ func readAndCountByBST(filename string, lengthThreshold int) (totalWordCount int
 	differendWordCount = st.Size()
 	return
 }
-
