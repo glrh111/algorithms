@@ -163,8 +163,6 @@ func (this *BinarySearchST) Floor(key *Comparable) (reKey *Comparable, err error
 // Ceiling 大于等于key的最大键
 func (this *BinarySearchST) Ceiling(key *Comparable) (reKey *Comparable, err error) {
 	rank := this.Rank(key)
-	err = nil
-	reKey = nil
 	if (rank >= this.size) {                               // 返回一个错误
 		err = errors.New("No return value")
 	} else {                                                      // 复制一份前一个元素，返回
