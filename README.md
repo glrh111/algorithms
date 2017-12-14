@@ -5,6 +5,8 @@ Algorithms Fourth Edition
 
 这里也是 `https://github.com/ekis/oldAlgorithms-2012`
 
+https://raw.githubusercontent.com/ekis/oldAlgorithms-2012/master/z-algs4-common/data-sets/leipzig1M.txt
+
 ## golang 的类型别名 `type wocao int`
 
 wocao 不继承 int 的方法，两者的方法互相隔离。
