@@ -42,6 +42,15 @@ keys := make([]*Comparable, size) // 需要分配空间
 copy(keys, this.keys[loRank:hiIndex])
 ```
 
+## git
+
+### 1 删除敏感数据
+
+`https://help.github.com/articles/removing-sensitive-data-from-a-repository/`
+
+`git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch chapter_03_查找/exam/leipzig1M.txt'  --prune-empty --tag-name-filter cat -- --all `
+
+
 
 
 
