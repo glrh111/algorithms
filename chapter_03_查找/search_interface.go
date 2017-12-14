@@ -68,24 +68,24 @@ func (this *Comparable) Value() interface{} {
 type SortedSymbolTableInterface interface {
 	SymbolTableInterface
 	// 最小的键
-	min() (*Comparable, error)
+	Min() (*Comparable, error)
 	// 最大的键
-	max() (*Comparable, error)
+	Max() (*Comparable, error)
 	// 小于等于key的最大键
-	floor() (*Comparable, error)
+	Floor(*Comparable) (*Comparable, error)
 	// 大于等于key的最小键
-	ceiling() (*Comparable, error)
+	Ceiling(*Comparable) (*Comparable, error)
 	// 排名为k的键
-	selectKey(index int) (*Comparable, error)
+	SelectKey(index int) (*Comparable, error)
 	// 键k的排名
-	rank(key *Comparable) int
+	Rank(key *Comparable) int
 	// 删除最小值 表为空时返回错误
-	deleteMin() error
+	DeleteMin() error
 	// 删除最大值
-	deleteMax() error
+	DeleteMax() error
 	// lo, hi 之间键的数量
-	sizeBetween(lo int, hi int) int
+	SizeBetween(lo *Comparable, hi *Comparable) int
 	// lo, hi 之间的所有键
-	keysBetween(lo int, hi int) []*Comparable
+	KeysBetween(lo *Comparable, hi *Comparable) []*Comparable
 }
 
