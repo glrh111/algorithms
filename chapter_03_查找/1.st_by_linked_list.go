@@ -1,13 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"os"
-	"bufio"
-	"io"
-	"strings"
-)
-
 // 链表实现符号表
 
 
@@ -142,42 +134,10 @@ func (this *LinkedListST) Keys() (keys []*Comparable) {
 // @filename the file to be read
 // @lengthThreshold just count len(word) >= @
 func readAndCount(filename string, lengthThreshold int) (totalWordCount int, differendWordCount int) {
-	totalWordCount, differendWordCount = 0, 0
-	inputFile, inputError := os.Open(filename)
-	if inputError != nil {
-		fmt.Println("Open file error: ", inputError.Error())
-	}
-	defer inputFile.Close()
-
-	inputReader := bufio.NewReader(inputFile)
-
-	// 构造一个ST
-	st := NewLinkedList()
-
-	for {
-		inputString, readError := inputReader.ReadString('\n')
-		// 去掉 \n
-		inputString = strings.Trim(inputString, "\n")
-		wordList := strings.Split(inputString, " ")
-		for _, word := range wordList {
-			//fmt.Println(word, " ", len(word))
-			if len(word) >= lengthThreshold {
-				totalWordCount += 1
-				// 首先查找在不在
-				everCount := st.Get(NewComparable(word))
-				if everCount == nil {
-					everCount = 1
-				} else {
-					everCount = everCount.(int) + 1
-				}
-				st.Put(NewComparable(word), everCount)
-			}
-		}
-		if readError == io.EOF {
-			break
-		}
-	}
-	differendWordCount = st.Size()
-	return
+	return ReadAndCount(
+		NewLinkedList(),
+		filename,
+		lengthThreshold,
+	)
 }
 

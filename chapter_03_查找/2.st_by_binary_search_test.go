@@ -198,7 +198,7 @@ func TestBinarySearch(t *testing.T) {
 			// fixme
 			// 读取 tale 1600 ms
 			// 读取 leipzig1M 跑了20多分钟，没有跑出来
-			t, d := readAndCountByBinarySearchST("exam/tale.txt", i)
+			t, d := readAndCountByBinarySearchST("exam/tinyTale.txt", i)
 			end := time.Now()
 			spendMilliSecond := end.Sub(start).Nanoseconds() / 1000000 // 秒
 			fmt.Printf("Total words [%d], Different words [%d], Spend MilliSeconds [%d]!\n", t, d, spendMilliSecond)

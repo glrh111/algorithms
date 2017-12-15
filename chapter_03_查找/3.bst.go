@@ -1,13 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"os"
-	"bufio"
-	"strings"
-	"io"
-)
-
 // 二叉树实现的 ST
 
 /*
@@ -84,6 +76,7 @@ func (this *BST) Get(key *Comparable) (value interface{}) {
 
 // 如果新建了BSTnode的话，返回出去
 // newBst 直接建立的结点  ifCreatNode 路径上是否建立新结点
+// 书上的实现是，每次新结点重新计算一下 node.size
 func (this *BST) put(node *BSTNode, key *Comparable, value interface{}) (newBst *BSTNode, ifCreatNode bool) {
 	//fmt.Println("\n insert key: ", key, value)
 	ifCreatNode = false
@@ -180,43 +173,11 @@ func (this *BST) Keys() (keys []*Comparable) {
 	return this.keys(this.root)
 }
 
-// 二分查找法实现的符号表的实际应用
+
 func readAndCountByBST(filename string, lengthThreshold int) (totalWordCount int, differendWordCount int) {
-	totalWordCount, differendWordCount = 0, 0
-	inputFile, inputError := os.Open(filename)
-	if inputError != nil {
-		fmt.Println("Open file error: ", inputError.Error())
-	}
-	defer inputFile.Close()
-
-	inputReader := bufio.NewReader(inputFile)
-
-	// 构造一个ST
-	st := NewBST()
-
-	for {
-		inputString, readError := inputReader.ReadString('\n')
-		// 去掉 \n
-		inputString = strings.Trim(inputString, "\n")
-		wordList := strings.Split(inputString, " ")
-		for _, word := range wordList {
-			//fmt.Println(word, " ", len(word))
-			if len(word) >= lengthThreshold {
-				totalWordCount += 1
-				// 首先查找在不在
-				everCount := st.Get(NewComparable(word))
-				if everCount == nil {
-					everCount = 1
-				} else {
-					everCount = everCount.(int) + 1
-				}
-				st.Put(NewComparable(word), everCount)
-			}
-		}
-		if readError == io.EOF {
-			break
-		}
-	}
-	differendWordCount = st.Size()
-	return
+	return ReadAndCount(
+		NewBST(),
+		filename,
+		lengthThreshold,
+	)
 }

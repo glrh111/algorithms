@@ -106,7 +106,7 @@ func TestLinkedListST(t *testing.T) {
 		// 读取文件内容
 		for _, i := range []int{1, 8, 10} {
 			start := time.Now()
-			t, d := readAndCount("exam/tale.txt", i)
+			t, d := readAndCount("exam/tinyTale.txt", i)
 			end := time.Now()
 			spendMilliSecond := end.Sub(start).Nanoseconds() / 1000000 // 秒
 			fmt.Printf("Total words [%d], Different words [%d], Spend MilliSeconds [%d]!\n", t, d, spendMilliSecond)

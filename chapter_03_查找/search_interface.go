@@ -2,6 +2,10 @@ package main
 
 import (
 	"strings"
+	"os"
+	"fmt"
+	"bufio"
+	"io"
 )
 
 type ComparableInterface interface {
@@ -47,7 +51,6 @@ func (this *Comparable) Value() interface{} {
 /*
    下面是ST的 interface
  */
-
  type SymbolTableInterface interface {
 	// 更新操作
 	Put(key *Comparable, value interface{})
@@ -87,5 +90,43 @@ type SortedSymbolTableInterface interface {
 	SizeBetween(lo *Comparable, hi *Comparable) int
 	// lo, hi 之间的所有键
 	KeysBetween(lo *Comparable, hi *Comparable) []*Comparable
+}
+
+// 这个函数用于测试读取示例数据速度
+func ReadAndCount(counter SymbolTableInterface, filename string, lengthThreshold int) (totalWordCount int, differendWordCount int) {
+	totalWordCount, differendWordCount = 0, 0
+	inputFile, inputError := os.Open(filename)
+	if inputError != nil {
+		fmt.Println("Open file error: ", inputError.Error())
+	}
+	defer inputFile.Close()
+
+	inputReader := bufio.NewReader(inputFile)
+
+	for {
+		inputString, readError := inputReader.ReadString('\n')
+		// 去掉 \n
+		inputString = strings.Trim(inputString, "\n")
+		wordList := strings.Split(inputString, " ")
+		for _, word := range wordList {
+			//fmt.Println(word, " ", len(word))
+			if len(word) >= lengthThreshold {
+				totalWordCount += 1
+				// 首先查找在不在
+				everCount := counter.Get(NewComparable(word))
+				if everCount == nil {
+					everCount = 1
+				} else {
+					everCount = everCount.(int) + 1
+				}
+				counter.Put(NewComparable(word), everCount)
+			}
+		}
+		if readError == io.EOF {
+			break
+		}
+	}
+	differendWordCount = counter.Size()
+	return
 }
 
