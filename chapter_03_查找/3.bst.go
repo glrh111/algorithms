@@ -81,98 +81,60 @@ func (this *BST) Get(key *Comparable) (value interface{}) {
 // 如果新建了BSTnode的话，返回出去
 // newBst 直接建立的结点  ifCreatNode 路径上是否建立新结点
 // 书上的实现是，每次新结点重新计算一下 node.size
-func (this *BST) put(node *BSTNode, key *Comparable, value interface{}) (newBst *BSTNode, ifCreatNode bool) {
+func (this *BST) put(node *BSTNode, key *Comparable, value interface{}) (newBst *BSTNode) {
 	//fmt.Println("\n insert key: ", key, value)
-	ifCreatNode = false
 	if (nil == node) {
 		newBst = NewBSTNode(key, value, 1)
-		ifCreatNode = true
 	} else {
 		//fmt.Println("before insert key: ", key, " node.size is: ", node.size)
 		compRe := node.key.CompareTo(*key)
 		if (0 == compRe) {   // key 存在， 更新 value
 			node.value = value
 		} else if (compRe < 0) { // 新key 比该结点大，去右侧
-			subNewBST, ifSubCreatNode := this.put(node.rightNode, key, value)
-			if (subNewBST != nil) {
-				node.rightNode = subNewBST
-			}
-			if ifSubCreatNode {
-				node.size++
-				ifCreatNode = ifSubCreatNode
-			}
+			node.rightNode = this.put(node.rightNode, key, value)
 		} else {
-			subNewBST, ifSubCreatNode := this.put(node.leftNode, key, value)
-			if (subNewBST != nil) {
-				node.leftNode = subNewBST
-			}
-			if ifSubCreatNode {
-				node.size++
-				ifCreatNode = ifSubCreatNode
-			}
+			node.leftNode = this.put(node.leftNode, key, value)
 		}
-		//fmt.Println("after insert key: ", key, " node.size is: ", node.size)
+		node.size = node.leftNode.Size() + node.rightNode.Size() + 1
+		newBst = node
 	}
-
 	return
 }
 
 // PUT
 func (this *BST) Put(key *Comparable, value interface{}) {
-	re, _ := this.put(this.root, key, value)
-	if re != nil {
-		this.root = re
-	}
+	this.root = this.put(this.root, key, value)
 }
 
 // 是否成功删除，是否需要替换子结点，替换子结点的值 FIXME 参考P261 的简单实现
-func (this *BST) delete(node *BSTNode, key *Comparable) (ifDelete bool, ifReplace bool, replaceNode *BSTNode) {
-	if nil != node {
+func (this *BST) delete(node *BSTNode, key *Comparable) (repNode *BSTNode) {
+
+	if node != nil {
 		reComp := node.key.CompareTo(*key)
-		if reComp == 0 {   // 执行删除操作
-			// 判断有无后继结点。2种情况，1）只有一个子结点 2）有两个子结点
-			if node.leftNode == nil && node.rightNode == nil {
-				replaceNode = nil
-			} else if node.leftNode == nil {
-				replaceNode = node.rightNode
+
+		if reComp == 0 { // 在这里删除. 区分左右侧是否有值
+
+			if node.leftNode == nil {
+				node = node.rightNode
 			} else if node.rightNode == nil {
-				replaceNode = node.leftNode
-			} else { // 两个子结点. 将右边结点的最小值，替换为这个结点
-				rightMinNode := this.minNode(node.rightNode) // 返回key吗？
-				this.deleteMin(node.rightNode) // 孤立这个结点. 这里不会
-
-				rightMinNode.leftNode = node.leftNode
-				rightMinNode.rightNode = node.rightNode
-
-				rightMinNode.size = rightMinNode.leftNode.Size() + rightMinNode.rightNode.Size()
-
-				replaceNode = rightMinNode
+				node = node.leftNode
+			} else {
+				rightMin := this.minNode(node.rightNode)
+				rightMin.rightNode = this.deleteMin(node.rightNode) // 删除右侧最小的结点
+				rightMin.leftNode = node.leftNode
+				node = rightMin
 			}
-			ifReplace = true
-			ifDelete = true
-		} else if reComp < 0 { // 去右边. 更换右边的结点
-			subIfDelete, subIfReplace, subReplaceNode := this.delete(node.rightNode, key)
-			if subIfReplace {
-				node.rightNode = subReplaceNode
-				replaceNode = nil
-				ifReplace = false
-			}
-			if subIfDelete {
-				node.size--
-				ifDelete = true
-			}
+		} else if reComp < 0 { // right
+			node.rightNode = this.delete(node.rightNode, key)
 		} else {
-			subIfDelete, subIfReplace, subReplaceNode := this.delete(node.leftNode, key)
-			if subIfReplace {
-				node.leftNode = subReplaceNode
-				replaceNode = nil
-				ifReplace = false
-			}
-			if subIfDelete {
-				node.size--
-				ifDelete = true
-			}
+			node.leftNode = this.delete(node.leftNode, key)
 		}
+		// 应该返回新结点
+		if node != nil {
+			node.size = node.leftNode.Size() + node.rightNode.Size() + 1
+		}
+		repNode = node
+
 	}
 	return
 }
@@ -210,32 +172,26 @@ func (this *BST) IsEmpty() bool {
 	return 0 == this.Size()
 }
 
-func (this *BST) keys(node *BSTNode) (ks []*Comparable) {
-	if (nil == node) {
-		ks = []*Comparable{}
-	} else {
-		ks = append(
-			this.keys(node.leftNode),
-			append(
-				[]*Comparable{node.key},
-				this.keys(node.rightNode)...,
-			)...,
-		)
+// 使用keys 数组，来回传递
+func (this *BST) keys(node *BSTNode, keyList *[]*Comparable) {
+	if (nil != node) {
+		this.keys(node.leftNode, keyList)
+		*keyList = append(*keyList, node.key)
+		this.keys(node.rightNode, keyList)
 	}
-	return
 }
 
 // Keys
-func (this *BST) Keys() (keys []*Comparable) {
-	return this.keys(this.root)
+func (this *BST) Keys() (keyList []*Comparable) {
+	keyList = []*Comparable{}
+	this.keys(this.root, &keyList)
+	return
 }
 
 func (this *BST) minNode(node *BSTNode) (minN *BSTNode) {
 	if nil == node { // root 才会走到这里
 		minN = nil
 	} else if (node.leftNode == nil) {
-		//key = &Comparable{}
-		//*key = *node.key // 复制一份 FIXME 这里不执行复制操作，因为删除操作里边需要用到。
 		minN = node
 	} else {
 		minN = this.minNode(node.leftNode)
@@ -396,64 +352,48 @@ func (this *BST) Rank(key *Comparable) (rank int) {
 	return this.rank(this.root, key)
 }
 
-func (this *BST) deleteMin(node *BSTNode) (ifDelete bool, appNode *BSTNode, ifReplace bool) {
-	if node == nil {
-		ifDelete = false
-	} else {
-		subIfDelete, subAppNode, subIfReplace := this.deleteMin(node.leftNode)
-		if ! subIfDelete { // 如果没有删除，那么删除该结点
-			// 检查是否有右结点
-			ifReplace = true
-			ifDelete = true
-			appNode = node.rightNode
-		} else { // size--
-			node.size--
-			if subIfReplace {
-				node.leftNode = subAppNode
-				appNode = nil
-				ifReplace = false
-			}
-			ifDelete = true
+func (this *BST) deleteMin(node *BSTNode) (repNode *BSTNode) {
+	if nil != node {
+		if nil == node.leftNode {
+			repNode = node.rightNode
+		} else {
+			node.leftNode = this.deleteMin(node.leftNode)
+			node.size = node.leftNode.Size() + node.rightNode.Size() + 1
+			repNode = node
 		}
 	}
+
 	return
 }
 
 // DeleteMin 删除最小值
 func (this *BST) DeleteMin() (err error) {
-	if ifDelete, _, _ := this.deleteMin(this.root); ! ifDelete {
+	if this.root == nil {
 		err = errors.New("BST is Empty")
+	} else {
+		this.root = this.deleteMin(this.root)
 	}
 	return
 }
 
-func (this *BST) deleteMax(node *BSTNode) (ifDelete bool, appNode *BSTNode, ifReplace bool) {
-	if node == nil {
-		ifDelete = false
+func (this *BST) deleteMax(node *BSTNode) (repNode *BSTNode ) {
+	if nil == node.rightNode {
+		repNode = node.leftNode
 	} else {
-		subIfDelete, subAppNode, subIfReplace := this.deleteMax(node.rightNode)
-		if ! subIfDelete { // 如果没有删除，那么检查该结点情况
-			// 检查是否有右结点
-			ifReplace = true
-			ifDelete = true
-			appNode = node.leftNode
-		} else {       // size--
-			node.size--
-			if subIfReplace {
-				node.rightNode = subAppNode
-				appNode = nil
-				ifReplace = false
-			}
-			ifDelete = true
-		}
+		node.rightNode = this.deleteMax(node.rightNode)
+		node.size = node.leftNode.Size() + node.rightNode.Size() + 1
+		repNode = node
 	}
+
 	return
 }
 
 // DeleteMin 删除最小值 FIXME 实现有误
 func (this *BST) DeleteMax() (err error) {
-	if ifDelete, _, _ := this.deleteMax(this.root); ! ifDelete {
+	if this.root == nil {
 		err = errors.New("BST is Empty")
+	} else {
+		this.root = this.deleteMax(this.root)
 	}
 	return
 }
@@ -476,14 +416,28 @@ func (this *BST) SizeBetween(lo *Comparable, hi *Comparable) (size int) {
 	return
 }
 
-// 检查每个树上的，然后返回。不过效率太低了。FIXME 先不搞了，费头发。白天再弄。
+// 检查每个树上的，然后返回。不过效率太低了。
 // ( ∞, lo)  1
 // [lo, hi]  2
 // (hi, ∞ )  3
-func (this *BST) keysBetween(node *BSTNode, keys []*Comparable, lo *Comparable, hi *Comparable) (status int) {
+func (this *BST) keysBetween(node *BSTNode, keys *[]*Comparable, lo *Comparable, hi *Comparable) {
 
 	// walk tree 中序遍历
 	// 设置一个 status , 决定遍历区间
+	if node != nil {
+		compLo := node.key.CompareTo(*lo)
+		compHi := node.key.CompareTo(*hi)
+
+		if (compLo > 0) {
+			this.keysBetween(node.leftNode, keys, lo, hi)
+		}
+		if (compLo >= 0 && compHi <= 0) {
+			*keys = append(*keys, node.key)
+		}
+		if (compHi < 0) {
+			this.keysBetween(node.rightNode, keys, lo, hi)
+		}
+	}
 
 	return
 }
@@ -491,7 +445,7 @@ func (this *BST) keysBetween(node *BSTNode, keys []*Comparable, lo *Comparable, 
 // 返回 [lo, hi] 之间的键的列表
 func (this *BST) KeysBetween(lo *Comparable, hi *Comparable) (keys []*Comparable) {
 	keys = []*Comparable{}
-	this.keysBetween(this.root, keys, lo, hi)
+	this.keysBetween(this.root, &keys, lo, hi)
 	return
 }
 

@@ -183,20 +183,27 @@ func TestBST(t *testing.T) {
 		size = st.SizeBetween(NewComparable("T"), NewComparable("A")) // ==0
 		So(size, ShouldEqual, 0)
 
-		//// KeysBetween 1) 测试两个key都存在于st中的 2) 测试一个key在st中的 3) 两个都不在 4) 测试 hi < lo 的
-		//keys := st.KeysBetween(NewComparable("B"), NewComparable("M")) // BELM
-		//So(len(keys), ShouldEqual, 4)
-		//for index, key := range keys {
-		//	So(key.Value(), ShouldEqual, string("BELM"[index]))
-		//}
-		//
-		//keys = st.KeysBetween(NewComparable("B"), NewComparable("N")) // BELM
-		//for index, key := range keys {
-		//	So(key.Value(), ShouldEqual, string("BELM"[index]))
-		//}
-		//
-		//keys = st.KeysBetween(NewComparable("T"), NewComparable("A")) // ==0
-		//So(len(keys), ShouldEqual, 0)
+		for _, value := range st.Keys() {
+			fmt.Println("大哥", value.Value())
+		}
+
+		// KeysBetween 1) 测试两个key都存在于st中的 2) 测试一个key在st中的 3) 两个都不在 4) 测试 hi < lo 的
+		keys := st.KeysBetween(NewComparable("B"), NewComparable("M")) // BELM
+		for _, value := range keys {
+			fmt.Println("我操", value.Value())
+		}
+		So(len(keys), ShouldEqual, 4)
+		for index, key := range keys {
+			So(key.Value(), ShouldEqual, string("BELM"[index]))
+		}
+
+		keys = st.KeysBetween(NewComparable("B"), NewComparable("N")) // BELM
+		for index, key := range keys {
+			So(key.Value(), ShouldEqual, string("BELM"[index]))
+		}
+
+		keys = st.KeysBetween(NewComparable("T"), NewComparable("A")) // ==0
+		So(len(keys), ShouldEqual, 0)
 
 	})
 

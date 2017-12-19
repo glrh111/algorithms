@@ -42,6 +42,12 @@ keys := make([]*Comparable, size) // 需要分配空间
 copy(keys, this.keys[loRank:hiIndex])
 ```
 
+### 4 slice 作为形参
+
+有空看看这个 https://blog.golang.org/slices
+
+slice是一个结构体，*slice 是指向结构体的指针，这一点需要区分。
+
 ## git
 
 ### 1 删除敏感数据
