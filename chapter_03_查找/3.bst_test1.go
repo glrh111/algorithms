@@ -215,7 +215,7 @@ func TestBST(t *testing.T) {
 		for _, i := range []int{1, 8, 10} {
 			start := time.Now()
 			// fixme
-			// 读取 tale 116 ms 比二分查找快了十倍
+			// 读取 tale        116 ms 比二分查找快了十倍
 			// 读取 leipzig1M   31651,9931,4420 ms leipzig1M
 			t, d := readAndCountByBST("exam/tale.txt", i)
 			end := time.Now()
