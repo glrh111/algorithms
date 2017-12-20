@@ -134,7 +134,6 @@ func (this *BST) delete(node *BSTNode, key *Comparable) (repNode *BSTNode) {
 			node.size = node.leftNode.Size() + node.rightNode.Size() + 1
 		}
 		repNode = node
-
 	}
 	return
 }
@@ -142,7 +141,7 @@ func (this *BST) delete(node *BSTNode, key *Comparable) (repNode *BSTNode) {
 // Delete 删除
 // 参见书本 page 260(总页码) T.Hibbard 方法
 func (this *BST) Delete(key *Comparable) {
-	this.delete(this.root, key)
+	this.root = this.delete(this.root, key)
 }
 
 func (this *BST) contains(node *BSTNode, key *Comparable) (ifContains bool) {
