@@ -48,6 +48,30 @@ copy(keys, this.keys[loRank:hiIndex])
 
 slice是一个结构体，*slice 是指向结构体的指针，这一点需要区分。
 
+### 5 计算key的hash值
+
+https://stackoverflow.com/questions/13582519/how-to-generate-hash-number-of-a-string-in-go
+
+```go
+package main
+
+import (
+        "fmt"
+        "hash/fnv"
+)
+
+func hash(s string) uint32 {
+        h := fnv.New32a()
+        h.Write([]byte(s))
+        return h.Sum32()
+}
+
+func main() {
+        fmt.Println(hash("HelloWorld"))
+        fmt.Println(hash("HelloWorld."))
+}
+```
+
 ## git
 
 ### 1 删除敏感数据
