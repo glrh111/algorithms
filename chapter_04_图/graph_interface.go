@@ -18,8 +18,9 @@ type BagInterface interface {
    广度优先搜索使用的FIFO队列. 用链表实现
  */
 type FIFOQueueInterface interface {
-	Push(item int)
-	Pop() (int, bool)  // 弹出一个元素
+	Enqueue(item int)
+	Dequeue() (int, bool)  // 弹出一个元素
+	Size() int
 }
 
 /*
