@@ -72,6 +72,11 @@ func main() {
 }
 ```
 
+### 6 迭代器实现
+
+参考 `https://studygolang.com/articles/1695`
+
+
 ## git
 
 ### 1 删除敏感数据
@@ -79,6 +84,7 @@ func main() {
 `https://help.github.com/articles/removing-sensitive-data-from-a-repository/`
 
 `git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch chapter_03_查找/exam/leipzig1M.txt'  --prune-empty --tag-name-filter cat -- --all `
+
 
 
 
