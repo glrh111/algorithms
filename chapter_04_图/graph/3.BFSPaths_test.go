@@ -1,7 +1,7 @@
 // 测试内容
 // 每个文件一个测试内容
 
-package main
+package graph
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -20,7 +20,7 @@ func TestPathsBFS(t *testing.T) {
 		fmt.Println("BFSPaths 功能测试：")
 
 		// tinyG , mediumG
-		var graph *Graph = NewGraphFromFile("exam/mediumG.txt")
+		var graph *Graph = NewGraphFromFile("../exam/mediumG.txt")
 
 		var paths PathsInterface = NewBFSPaths(graph, 0)
 

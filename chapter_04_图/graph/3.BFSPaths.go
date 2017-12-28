@@ -1,4 +1,4 @@
-package main
+package graph
 
 /*
    广度优先 paths

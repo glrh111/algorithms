@@ -1,4 +1,4 @@
-package main
+package graph
 
 /*
    双向链表，实现queue

@@ -1,7 +1,7 @@
 // 测试内容
 // 每个文件一个测试内容
 
-package main
+package graph
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -20,7 +20,7 @@ func TestCC(t *testing.T) {
 		fmt.Println("CC连通分量 功能测试：")
 
 		// tinyG , mediumG
-		var graph *Graph = NewGraphFromFile("exam/tinyG.txt")
+		var graph *Graph = NewGraphFromFile("../exam/tinyG.txt")
 
 		var cc CCInterface = NewCC(graph)
 
@@ -35,12 +35,19 @@ func TestCC(t *testing.T) {
 		So(cc.Connected(0,7), ShouldEqual, false)
 		So(cc.Connected(0,12), ShouldEqual, false)
 
-
-
 		// Id
 		So(cc.Id(0), ShouldEqual, 0)
 		So(cc.Id(7), ShouldEqual, 1)
 		So(cc.Id(12), ShouldEqual, 2)
+
+		// 打印出来所有的连通分量
+		for i:=0; i<cc.Count(); i++ {
+			fmt.Printf("Id [%d]: ", i)
+			for ele := range cc.IteratorChan(i) {
+				fmt.Printf("%d ", ele)
+			}
+			fmt.Println()
+		}
 
 	})
 

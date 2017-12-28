@@ -1,7 +1,7 @@
 // 测试内容
 // 每个文件一个测试内容
 
-package main
+package graph
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -19,7 +19,7 @@ func TestDepthFirstSearch(t *testing.T) {
 
 		fmt.Println("DepthFirstSearch 功能测试：")
 
-		var graph *Graph = NewGraphFromFile("exam/tinyG.txt")
+		var graph *Graph = NewGraphFromFile("../exam/tinyG.txt")
 
 		// source = 0
 		var search0 SearchInterface = NewDepthFirstSearch(graph, 0) // 7

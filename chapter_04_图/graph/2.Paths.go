@@ -1,4 +1,4 @@
-package main
+package graph
 
 type Paths struct {
 	source int          // 初始点

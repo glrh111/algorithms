@@ -122,6 +122,22 @@ bool | connected(int v, int w) | v w 是否连通
 int | count() | 连通分量数
 int | id(v int) | v 所在的连通分量的标识符
 
+TODO ： 无环图，二分图 参考 Page 352
+
+### 4.1.7 符号图
+
+用符号作为顶点名的图的API
+
+返回类型 | 方法名 | 描述
+---|---|---
+| SymbolGraph(filename string, delimiter string) | 
+bool | contains(key string) | key 是否为图的顶点
+int | index(key string) | key 的索引
+string | name(v int) | 索引v的顶点名
+Graph | G() | 隐藏的 Graph 对象
+
+符号表(key,index) 反向索引(index, key) 无向图
+
  
 
 

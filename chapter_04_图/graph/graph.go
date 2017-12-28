@@ -1,4 +1,4 @@
-package main
+package graph
 
 import (
 	"strconv"
@@ -80,6 +80,17 @@ func NewGraphFromFile(filename string) *Graph {
 	return g
 }
 
+/*
+   构造一个空 Graph
+ */
+func NewGraphWithSize(v int) (g *Graph) {
+	return &Graph{
+		v: v,
+		e: 0,
+		adj: make([]*Bag, v),
+	}
+}
+
 func (g *Graph) V() int {
 	return g.v
 }
@@ -90,6 +101,11 @@ func (g *Graph) E() int {
 
 // 增加一条边
 func (g *Graph) AddEdge(v int, w int) {
+	for _, value := range []int{v,w} {
+		if g.adj[value] == nil {
+			g.adj[value] = NewBag(10)
+		}
+	}
 	g.adj[v].Add(NewKey(w))
 	g.adj[w].Add(NewKey(v))
 }

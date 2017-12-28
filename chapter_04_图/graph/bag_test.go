@@ -1,7 +1,7 @@
 // 测试内容
 // 每个文件一个测试内容
 
-package main
+package graph
 
 import (
 	. "github.com/smartystreets/goconvey/convey"

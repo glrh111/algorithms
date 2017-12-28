@@ -1,4 +1,4 @@
-package main
+package graph
 
 type DepthFirstSearch struct {
 	source int          // 初始点

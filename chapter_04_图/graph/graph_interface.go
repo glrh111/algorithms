@@ -1,4 +1,4 @@
-package main
+package graph
 
 // BagInterface
 // GraphInterface
@@ -58,6 +58,17 @@ type CCInterface interface {
 	Connected(v int, w int) bool
 	Count() int
 	Id(v int) int
+	IteratorChan(id int) chan int
+}
+
+/*
+   SymbolGraph 测试
+ */
+type SymbolGraphInterface interface {
+	Contains(name string) bool  // name 是否存在于符号表
+	Index(name string) int      // name 的索引
+	Name(v int) string          // 顶点 v 对应的名称
+	G() *Graph                  // 隐藏的图
 }
 
 

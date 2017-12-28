@@ -1,4 +1,4 @@
-package main
+package graph
 
 /*
     连通分量 将连通的点汇总到一起
@@ -67,6 +67,11 @@ func (cc *CC) Count() int {
 // id(v) v 在哪个连通分量
 func (cc *CC) Id(v int) int {
 	return cc.vToId[v]
+}
+
+// IdElemList
+func (cc *CC) IteratorChan(id int) chan int {
+	return cc.idToVList[id].IteratorChan()
 }
 
 
