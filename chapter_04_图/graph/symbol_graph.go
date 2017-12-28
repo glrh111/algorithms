@@ -9,11 +9,8 @@ import (
 	"io"
 )
 
-/* 邻接表实现的图
-
-   adj : []Bag
-       : 索引表示顶点序号v，从0开始
-       : Bag 里的元素，是与v相邻的顶点的序号
+/*
+    符号图 SymbolGraph
 
  */
 
@@ -26,9 +23,18 @@ type SymbolGraph struct {
 
 /*
     从文件中读取图
-    扫描第一遍： 
+    扫描第一遍：构建 nameToIndex , indexToName
+    扫描第二遍：构建 graph
+
  */
-func NewSymbolGraphFromFile(filename string) *Graph {
+func NewSymbolGraphFromFile(filename string, delimiter string) (sg *SymbolGraph) {
+
+	sg = &SymbolGraph{
+		graph: nil,
+		nameToIndex: NewLinearProbingHashST(10),
+		indexToName: []string{},
+	}
+
 	inputFile, inputError := os.Open(filename)
 	if inputError != nil {
 		fmt.Println("Open file error: ", inputError.Error())
@@ -37,39 +43,17 @@ func NewSymbolGraphFromFile(filename string) *Graph {
 
 	inputReader := bufio.NewReader(inputFile)
 
-	// 第一行是 v
-	inputString, readError := inputReader.ReadString('\n')
-	inputString = strings.Trim(inputString, "\n")
-	v, _ := strconv.Atoi(inputString)
-
-	// 第二行是 e
-	inputString, readError = inputReader.ReadString('\n')
-	inputString = strings.Trim(inputString, "\n")
-	e, _ := strconv.Atoi(inputString)
-
-	g := &Graph{
-		v,
-		e,
-		make([]*Bag, v),
-	}
-
-	for i := 0; i < v; i++ {
-		g.adj[i] = NewBag(10)
-	}
-
 	for {
-		inputString, readError = inputReader.ReadString('\n')
+		inputString, readError := inputReader.ReadString('\n')
 		// 去掉 \n
 		inputString = strings.Trim(inputString, "\n")
 
 		if len(inputString) > 0 {
-			eList := strings.Split(inputString, " ")
-			// 第一个元素是 当前顶点，以后是与之相连的
-			if len(eList) >= 2 {
-				currentV, _ := strconv.Atoi(eList[0])
-				for i := 1; i < len(eList); i++ {
-					w, _ := strconv.Atoi(eList[i])
-					g.AddEdge(currentV, w)
+
+			for _, everyField := range strings.Split(inputString, delimiter) {
+				if ! sg.nameToIndex.Contains(NewComparable(everyField)) {
+					sg.nameToIndex.Put(NewComparable(everyField), len(sg.indexToName))
+					sg.indexToName = append(sg.indexToName, everyField)
 				}
 			}
 		}
@@ -78,7 +62,38 @@ func NewSymbolGraphFromFile(filename string) *Graph {
 			break
 		}
 	}
-	return g
+
+	// 先不管 E
+	inputReader = bufio.NewReader(inputFile)
+
+	sg.graph = NewGraphWithSize(len(sg.indexToName))
+
+	for {
+		inputString, readError := inputReader.ReadString('\n')
+		// 去掉 \n
+		inputString = strings.Trim(inputString, "\n")
+
+		if len(inputString) > 0 {
+
+			// 所有里边的值，都得添加相连关系
+			vList := strings.Split(inputString, delimiter)
+
+			for i:=0; i<len(vList); i++ {
+				for j:=i; j<len(vList); j++ {
+					sg.graph.AddEdge(
+						sg.Index(vList[i]),
+						sg.Index(vList[j]),
+					)
+				}
+			}
+		}
+
+		if readError == io.EOF { //
+			break
+		}
+	}
+
+	return
 }
 
 func (sg *SymbolGraph) Contains(name string) bool {
