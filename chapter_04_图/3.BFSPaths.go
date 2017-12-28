@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 /*
    广度优先 paths
  */
@@ -22,13 +20,13 @@ func NewBFSPaths(graph *Graph, s int) (p *BFSPaths) {
 		edgeTo: make([]int, graph.V()),
 	}
 
-	p.dfs()
+	p.bfs()
 
 	return
 }
 
 // 广度优先
-func (p *BFSPaths) dfs() {
+func (p *BFSPaths) bfs() {
 
 	// 维护一个 FIFOQueue
 	var queue FIFOQueueInterface = NewFIFOQueue()
@@ -41,7 +39,6 @@ func (p *BFSPaths) dfs() {
 			if !p.markedList[w] {
 				p.markedList[w] = true
 				queue.Enqueue(w)
-				fmt.Println("enqueue: ", w)
 				p.edgeTo[w] = v
 			}
 		}

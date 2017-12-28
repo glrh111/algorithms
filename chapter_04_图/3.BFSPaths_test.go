@@ -19,39 +19,12 @@ func TestPathsBFS(t *testing.T) {
 
 		fmt.Println("BFSPaths 功能测试：")
 
-		var graph *Graph = NewGraphFromFile("exam/tinyG.txt")
+		// tinyG , mediumG
+		var graph *Graph = NewGraphFromFile("exam/mediumG.txt")
 
 		var paths PathsInterface = NewBFSPaths(graph, 0)
 
-		fmt.Println(paths.PathTo(0))
-
-		//// source = 0
-		//var search0 SearchInterface = NewDepthFirstSearch(graph, 0) // 7
-		//
-		//// Count
-		//So(search0.Count(), ShouldEqual, 7)
-		//
-		//// Marked
-		//for _, v := range []int{0,1,2,3,4,5,6} {
-		//	So(search0.Marked(v), ShouldEqual, true)
-		//}
-		//for _, v := range []int{7,8,9,10,11,12} {
-		//	So(search0.Marked(v), ShouldEqual, false)
-		//}
-		//
-		//// source = 9
-		//var search9 SearchInterface = NewDepthFirstSearch(graph, 9)
-		//
-		//// Count
-		//So(search9.Count(), ShouldEqual, 4)
-		//
-		//// Marked
-		//for _, v := range []int{9,10,11,12} {
-		//	So(search9.Marked(v), ShouldEqual, true)
-		//}
-		//for _, v := range []int{0,1,2,3,4,5,6,7,8} {
-		//	So(search9.Marked(v), ShouldEqual, false)
-		//}
+		fmt.Println(paths.PathTo(100))
 
 	})
 

@@ -107,7 +107,22 @@ iterable | pathTo(int v) | s 到 v 的路径
 
 单点最短路径：广度优先搜索 BFS
 
+![BFS_and_DFS](http://o9hjg7h8u.bkt.clouddn.com/4.1.19BFS_and_DFS.png)
 
+### 4.1.6 连通分量
+
+深度优先搜索
+
+连通分量的API
+
+返回值类型 | 方法名 | 描述
+---|---|---
+| CC(graph Graph) | 预处理构造函数
+bool | connected(int v, int w) | v w 是否连通
+int | count() | 连通分量数
+int | id(v int) | v 所在的连通分量的标识符
+
+ 
 
 
 

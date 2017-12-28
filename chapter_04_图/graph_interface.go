@@ -51,4 +51,14 @@ type PathsInterface interface {
 	PathTo(v int) []int   // 到v的路径
 }
 
+/*
+    CC 连通分量
+ */
+type CCInterface interface {
+	Connected(v int, w int) bool
+	Count() int
+	Id(v int) int
+}
+
+
 
