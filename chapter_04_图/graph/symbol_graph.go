@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"strconv"
-	"fmt"
 	"os"
 	"bufio"
 	"strings"
@@ -13,7 +11,6 @@ import (
     符号图 SymbolGraph
 
  */
-
 
 type SymbolGraph struct {
 	graph *Graph
@@ -37,7 +34,7 @@ func NewSymbolGraphFromFile(filename string, delimiter string) (sg *SymbolGraph)
 
 	inputFile, inputError := os.Open(filename)
 	if inputError != nil {
-		fmt.Println("Open file error: ", inputError.Error())
+		panic("Open file error: " + inputError.Error())
 	}
 	defer inputFile.Close()
 
@@ -63,13 +60,14 @@ func NewSymbolGraphFromFile(filename string, delimiter string) (sg *SymbolGraph)
 		}
 	}
 
-	// 先不管 E
-	inputReader = bufio.NewReader(inputFile)
+	// 第二遍读取
+	inputFile.Seek(0, 0)
 
 	sg.graph = NewGraphWithSize(len(sg.indexToName))
 
 	for {
 		inputString, readError := inputReader.ReadString('\n')
+
 		// 去掉 \n
 		inputString = strings.Trim(inputString, "\n")
 
@@ -79,11 +77,14 @@ func NewSymbolGraphFromFile(filename string, delimiter string) (sg *SymbolGraph)
 			vList := strings.Split(inputString, delimiter)
 
 			for i:=0; i<len(vList); i++ {
-				for j:=i; j<len(vList); j++ {
-					sg.graph.AddEdge(
+				for j:=i+1; j<len(vList); j++ {
+					if sg.graph.AddEdge(              // 为了算边，在更新bag的时候，如果确实增加了一个，那么 E++
 						sg.Index(vList[i]),
 						sg.Index(vList[j]),
-					)
+					) {
+						sg.graph.e++
+						//fmt.Println("Add E: ", sg.Index(vList[i]), sg.Index(vList[j]))
+					}
 				}
 			}
 		}
@@ -97,7 +98,7 @@ func NewSymbolGraphFromFile(filename string, delimiter string) (sg *SymbolGraph)
 }
 
 func (sg *SymbolGraph) Contains(name string) bool {
-	return true
+	return sg.nameToIndex.Contains(NewComparable(name))
 }
 
 func (sg *SymbolGraph) Index(name string) int {

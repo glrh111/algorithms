@@ -1,4 +1,4 @@
-package graph
+package digraph
 
 import (
 	"strconv"
@@ -18,7 +18,7 @@ import (
  */
 
 
-type Graph struct {
+type Digraph struct {
 	v int       // 顶点数量
 	e int       // 边的数量
 	adj []*Bag  // [v] = 与之相邻的顶点序号
@@ -27,10 +27,10 @@ type Graph struct {
 /*
     从文件中读取图
  */
-func NewGraphFromFile(filename string) *Graph {
+func NewDigraphFromFile(filename string) *Digraph {
 	inputFile, inputError := os.Open(filename)
 	if inputError != nil {
-		fmt.Println("Open file error: ", inputError.Error())
+		panic("Open file error: " + inputError.Error())
 	}
 	defer inputFile.Close()
 
@@ -38,22 +38,22 @@ func NewGraphFromFile(filename string) *Graph {
 
 	// 第一行是 v
 	inputString, readError := inputReader.ReadString('\n')
-	inputString = strings.TrimSpace(inputString)
+	inputString = strings.Trim(inputString, "\n")
 	v, _ := strconv.Atoi(inputString)
 
 	// 第二行是 e
 	inputString, readError = inputReader.ReadString('\n')
-	inputString = strings.TrimSpace(inputString)
+	inputString = strings.Trim(inputString, "\n")
 	e, _ := strconv.Atoi(inputString)
 
-	g := &Graph{
+	dg := &Digraph{
 		v,
 		e,
 		make([]*Bag, v),
 	}
 
 	for i := 0; i < v; i++ {
-		g.adj[i] = NewBag(10)
+		dg.adj[i] = NewBag(10)
 	}
 
 	for {
@@ -68,7 +68,7 @@ func NewGraphFromFile(filename string) *Graph {
 				currentV, _ := strconv.Atoi(eList[0])
 				for i := 1; i < len(eList); i++ {
 					w, _ := strconv.Atoi(eList[i])
-					g.AddEdge(currentV, w)
+					dg.AddEdge(currentV, w)
 				}
 			}
 		}
@@ -77,47 +77,44 @@ func NewGraphFromFile(filename string) *Graph {
 			break
 		}
 	}
-	return g
+	return dg
 }
 
 /*
    构造一个空 Graph
  */
-func NewGraphWithSize(v int) (g *Graph) {
-	return &Graph{
+func NewDigraphWithSize(v int) (g *Digraph) {
+	return &Digraph{
 		v: v,
 		e: 0,
 		adj: make([]*Bag, v),
 	}
 }
 
-func (g *Graph) V() int {
+func (g *Digraph) V() int {
 	return g.v
 }
 
-func (g *Graph) E() int {
+func (g *Digraph) E() int {
 	return g.e
 }
 
 // 增加一条边 bool 代表是否增加了一条边
-func (g *Graph) AddEdge(v int, w int) (ifAdd bool) {
-	for _, value := range []int{v,w} {
-		if g.adj[value] == nil {
-			g.adj[value] = NewBag(10)
-		}
+func (g *Digraph) AddEdge(v int, w int) (ifAdd bool) {
+	if g.adj[v] == nil {
+		g.adj[v] = NewBag(10)
 	}
 	ifAdd = g.adj[v].Add(NewKey(w))
-	g.adj[w].Add(NewKey(v))
 	return
 }
 
 // 一条边的所有顶点
-func (g *Graph) Adj(v int) chan int {
+func (g *Digraph) Adj(v int) chan int {
 	return g.adj[v].IteratorChan()
 }
 
 // 字符串表示
-func (g *Graph) ToString() (s string) {
+func (g *Digraph) ToString() (s string) {
 
 	// v , e
 	s += "V: " + strconv.Itoa(g.v) + " E: " + strconv.Itoa(g.e) + "\n"
@@ -133,49 +130,5 @@ func (g *Graph) ToString() (s string) {
 		s += "\n"
 	}
 
-	return
-}
-
-// v 的度数
-func (g *Graph) Degree(v int) (degree int) {
-	degree = 0
-
-	for range g.Adj(v) {
-		degree++
-	}
-
-	return
-}
-
-// 所有顶点的最大度数
-func (g *Graph) MaxDegree(v int) (maxDegree int) {
-	maxDegree = 0
-	for i:=0; i<g.v; i++ {
-		currentDegree := g.Degree(i)
-		if currentDegree > maxDegree {
-			maxDegree = currentDegree
-		}
-	}
-	return
-}
-
-// 所有顶点的平均degree
-func (g *Graph) AvgDegree(v int) int {
-	return 2 * g.e / g.v
-}
-
-// 自环的个数
-// TODO 实现与Page 334 不一样。为毛 n / 2 ?
-func (g * Graph) NumberOfSelfLoops() (n int) {
-	n = 0
-	for v:=0; v<g.v; v++ {
-		c := g.Adj(v)
-		for w := range c {
-			if w == v {
-				n++
-				//break // FIXME 这里 c 应该立马close, 但是规范不允许
-			}
-		}
-	}
 	return
 }

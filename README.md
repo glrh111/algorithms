@@ -76,6 +76,34 @@ func main() {
 
 参考 `https://studygolang.com/articles/1695`
 
+### 7 Golang 的单引号
+
+rune 类型的，rune 是 int32 的别名。可以用来访问字符串的原始字符，而不是字节。
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+ s := "我操你大爷1"
+ 
+ fmt.Println(len(s)) // 16
+ 
+ for _, value := range s {
+     fmt.Println(value, len(s))
+ } // 打印出来6个数
+ 
+ fmt.Println(s[7]) // 189 第七个字节
+ 
+ fmt.Println(len([]rune(s))) // 6
+ 
+ for _, value := range []rune(s) {
+     fmt.Println(string(value), len([]rune(s)))
+ }
+}
+
+```
 
 ## git
 
