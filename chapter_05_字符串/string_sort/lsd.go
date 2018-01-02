@@ -23,7 +23,6 @@ func LSDSort(a []string) {
 	w := len(a[0])
 
 	aux := make([]string, N) // 临时数组
-	 // 频率统计
 
 	// w 次排序
 	for i:=0; i<w; i++ {
@@ -89,7 +88,7 @@ func Timeit(a []string, sortFunc func (b []string)) {
 
 	//PrintArray(a)
 
-	fmt.Printf("消耗时间: %d ms", escapeMilliseconds)
+	fmt.Printf("消耗时间: %d ms\n", escapeMilliseconds)
 
 
 }

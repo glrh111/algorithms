@@ -11,26 +11,27 @@ import (
  */
 
 // w 为字符串宽度
-func TestLSDSort(t *testing.T) {
+func TestQuick3string(t *testing.T) {
 
 	// 简单测试
 	Convey("功能测试", t, func() {
 
-		fmt.Println("LSD 功能测试：")
+		fmt.Println("三向字符串排序 功能测试：")
 
 		rawA := []string{
-			"WOCAO",
-			"NIDAY",
-			"CACAC",
-			"NIMAD",
 			"WOCB2",
+			"WOCAO123",
+			"NIDAY%^&*",
+			"Y776",
+			"CACACAAAAAAAAAA",
+			"A",
 		}
 
-		Timeit(rawA, LSDSort)
+		PrintArray(rawA)
+
+		Timeit(rawA, Quick3string)
 
 		PrintArray(rawA)
-		// 生成 一系列日期
-		//Timeit(GenerateDateList(1000000), LSDSort)
 
 	})
 
