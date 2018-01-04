@@ -43,7 +43,9 @@ func TestLSDSort(t *testing.T) {
 		So(stringst.Contains("se0"), ShouldEqual, false)
 		So(stringst.Contains("shells"), ShouldEqual, true)
 
-		// DELETE
+		for _, key := range examStringList {
+			So(stringst.Contains(key), ShouldEqual, true)
+		}
 
 		// KEYS
 		for s := range stringst.Keys() {
@@ -51,21 +53,34 @@ func TestLSDSort(t *testing.T) {
 		}
 
 		// KeysWithPreffix
-		for s := range stringst.KeysWithPreffix("wocao") {
+		for s := range stringst.KeysWithPrefix("wocao") {
 			fmt.Println(s)
 		}
 
-		for s := range stringst.KeysWithPreffix("se") {
+		for s := range stringst.KeysWithPrefix("se") {
 			fmt.Println("wocao", s)
 		}
 
 		// LongestPrefixOf
-		So(stringst.LongestPrefixOf("sh"), ShouldEqual, "shells")
-		So(stringst.LongestPrefixOf("se"), ShouldEqual, "sells")
+		So(stringst.LongestPrefixOf("shellsa"), ShouldEqual, "shells")
+		So(stringst.LongestPrefixOf("sean"), ShouldEqual, "sea")
+		So(stringst.LongestPrefixOf("wocao"), ShouldEqual, "")
 
 		for key := range stringst.KeysThatMatch("s..") {
 			fmt.Println("match ...: ",  key)
 		}
+
+		fmt.Println(stringst.Get("she"))
+
+		// DELETE  "she", "sells", "sea", "shells", "by", "the", "sea", "shore"
+		ifDelete := stringst.Delete("she")
+		So(ifDelete, ShouldEqual, true)
+		ifDelete = stringst.Delete("she")
+		So(ifDelete, ShouldEqual, false)
+		So(stringst.Size(), ShouldEqual, 6)
+
+		So(stringst.Get("shells"), ShouldNotEqual, nil)
+
 
 	})
 

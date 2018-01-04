@@ -37,7 +37,7 @@ func (st *TrieST) get(node *Node, key string, d int) (retNode *Node) {
 		if d >= len(key) {
 			retNode = node
 		} else {
-			retNode = st.get(node.nextList[chatAt(key, d)], key, d+1)
+			retNode = st.get(node.nextList[charAt(key, d)], key, d+1)
 		}
 	}
 	return
@@ -53,7 +53,7 @@ func (st *TrieST) Get(key string) (retValue interface{}) {
 }
 
 func (st *TrieST) put(node *Node, key string, d int, value interface{}) (ifAdd bool) {
-	charIndex := chatAt(key, d)
+	charIndex := charAt(key, d)
 	keyNode := node.nextList[charIndex]
 	if keyNode == nil { // 新建结点
 		node.nextList[charIndex] = NewNode(nil, st.r)
@@ -83,7 +83,7 @@ func (st *TrieST) Size() int {
 }
 
 func (st *TrieST) contains(node *Node, key string, d int) (contains bool) {
-	keyNode := node.nextList[chatAt(key, d)]
+	keyNode := node.nextList[charAt(key, d)]
 	if keyNode != nil {
 		if d >= len(key)-1 { // 命中，检查值
 			contains = keyNode.value != nil
@@ -120,7 +120,7 @@ func (st *TrieST) Keys() (c chan string) {
 	return
 }
 
-func (st *TrieST) KeysWithPreffix(prefix string) (c chan string) {
+func (st *TrieST) KeysWithPrefix(prefix string) (c chan string) {
 	retNode := st.get(st.root, prefix, 0)
 	c = make(chan string)
 	if retNode != nil {
@@ -131,16 +131,27 @@ func (st *TrieST) KeysWithPreffix(prefix string) (c chan string) {
 	return
 }
 
-func (st *TrieST) LongestPrefixOf(prefix string) (key string) {
-	key = ""
-	for s := range st.KeysWithPreffix(prefix) {
-		if len(s) > len(key) {
-			key = s
-		}
+func (st *TrieST) search(node *Node, s string, d int, length int) (l int) {
+	if node == nil {
+		return length
 	}
+	if len(s)-1 == d {     // s 查完了
+		return d
+	}
+	if node.value != nil { // 继续往下走
+		length = d
+	}
+	l = st.search(node.nextList[charAt(s, d)], s, d+1, length)
 	return
 }
 
+// 返回值是key，它与 s 有最长的契合前缀
+func (st *TrieST) LongestPrefixOf(s string) (key string) {
+	length := st.search(st.root, s, 0, 0)
+	return s[:length]
+}
+
+// FIXME 这里可以重构一下，在collect上加一个参数
 func (st *TrieST) KeysThatMatch(pattern string) (c chan string) {
 	c = make(chan string)
 
@@ -156,13 +167,47 @@ func (st *TrieST) KeysThatMatch(pattern string) (c chan string) {
 	return
 }
 
+// 递归删除
+func (st *TrieST) delete(node *Node, key string, d int) (n *Node, ifDelete bool) {
+	if node == nil {
+		return node, false
+	}
+
+	if len(key) == d {                 // 找到最后了
+		if node.value != nil {         // 找到了这个值
+			node.value = nil
+			st.size--
+			ifDelete = true
+		}
+	} else {
+		node.nextList[charAt(key, d)], ifDelete = st.delete(node.nextList[charAt(key, d)], key, d+1) // 得检查一遍当前 node 否是为空
+	}
+
+	// 检查当前 node 是否为空
+	nodeIfEmpty := true
+	for i := 0; i < st.r; i++ {
+		if node.nextList[i] != nil {
+			nodeIfEmpty = false
+			break
+		}
+	}
+	if nodeIfEmpty { // 上面没有其他链接
+		n = nil
+	} else {
+		n = node
+	}
+
+	return
+}
+
 // delete
-func (st *TrieST) Delete() (ifDelete bool) {
+func (st *TrieST) Delete(key string) (ifDelete bool) {
+	st.root, ifDelete = st.delete(st.root, key, 0)
 	return
 }
 
 // 返回字符对应的ascii码
-func chatAt(s string, d int) (ascii int) {
+func charAt(s string, d int) (ascii int) {
 	return ASCII([]rune(s)[d])
 }
 
