@@ -1,10 +1,11 @@
 package compress
 
 import (
-	//"bytes"
 	"io"
 	"os"
 	"fmt"
+	"bytes"
+	"compress"
 )
 
 /*
@@ -40,6 +41,7 @@ func (si *BinaryStdIn) ReadAndWrite() {
 			break
 		}
 	}
+
 }
 
 
