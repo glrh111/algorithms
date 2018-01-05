@@ -14,7 +14,7 @@ type BinaryStdInInterface interface {
    标准输出字节流
  */
 type BinaryStdOutInterface interface {
-	Write(b bool)
+	WriteBool(b bool)  // 不做实现
 	WriteChar(c uint8)
 	Close()
 }
