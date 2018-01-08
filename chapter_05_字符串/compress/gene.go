@@ -10,7 +10,7 @@ func GeneCompress(fromFilename string, toFilename string) {
 	// n
 	var charAmount uint64
 
-	// 站坑
+	// 站坑 64 bits
 	for i:=0; i<64; i++ {
 		flout.WriteBool(false)
 	}
@@ -22,7 +22,9 @@ func GeneCompress(fromFilename string, toFilename string) {
 		}
 		cIndex := DNAALPHABET.ToIndex(rune(c)) // 将 cIndex 写入里边 [0, 3] 需要两位即可表示
 
-		// [ 高位, 低位 ]
+		//fmt.Println("in GeneCompress: ", string(c), cIndex)
+
+		// [ 高位, 低位 ] 8bits -> 2bits
 		flout.WriteBool(cIndex & 10 != 0)
 		flout.WriteBool(cIndex & 1 != 0)
 		charAmount += 1
@@ -51,7 +53,9 @@ func GeneCompress(fromFilename string, toFilename string) {
 func GeneExpand(fromFilename string, toFilename string) {
 	// 认真处理最后一个字节
 	flin := NewBinaryStdIn(fromFilename)
-	//flout := NewBinaryStdOut(toFilename)
+	flout := NewBinaryStdOut(toFilename)
+	defer flin.Close()
+	defer flout.Close()
 
 	// 解析出来字符数量
 	var charAmount uint64
@@ -61,5 +65,46 @@ func GeneExpand(fromFilename string, toFilename string) {
 	}
 
 	fmt.Println("解析出来的char数量为：", charAmount)
+
+	// 读取里边的信息
+	var expandCount uint64 // 解压出来的字符的数量 2bit 代表1个字符
+
+	for {
+
+		compressChar := flin.ReadChar() // 一次读取8个bit
+
+		compressBoolList := byteToBit(compressChar) // [bit] * 8 被压缩的
+
+		endFlag := false
+		for i:=0; i<4; i++ {
+			if expandCount >= charAmount {
+				endFlag = true
+				break
+			}
+
+			subBoolList := compressBoolList[i*2:i*2+2] // 代表一个 无符号数
+			var expandIndex int
+			for j, v := range subBoolList {
+				if v {
+					if j == 0 { // × 2
+						expandIndex += 2
+					} else {
+						expandIndex += 1
+					}
+				}
+			}
+			expandChar := DNAALPHABET.ToChar(expandIndex) // 代表的原始字符
+			flout.WriteChar(byte(expandChar))
+
+			expandCount += 1
+		}
+
+		if endFlag {
+			break
+		}
+
+	}
+
+	fmt.Println("解压完成： ", toFilename)
 
 }

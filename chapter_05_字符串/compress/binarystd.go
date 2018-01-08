@@ -34,10 +34,19 @@ func (si *BinaryStdIn) ReadBool() bool {
 	return si.ReadBit()
 }
 
+// FIXME 本函数与ReadBool 混合使用，会产生问题。
 func (si *BinaryStdIn) ReadChar() byte {
-	b, err := si.r.ReadByte()
-	si.err = err
-	return b
+	//if way {
+	//	b, err := si.r.ReadByte()
+	//	si.err = err
+	//	return b
+	//} else {
+		bits := make([]bool, 8)
+		for i := 0; i < 8; i++ {
+			bits[i] = si.ReadBool()
+		}
+		return bitToByte(bits)
+	//}
 }
 
 // 读完了之后，就是empty
@@ -51,17 +60,26 @@ func (si *BinaryStdIn) Close() {
 }
 
 
-func (si *BinaryStdIn) ReadAndWrite() {
-	for {
-		bit := 0
-		if si.ReadBit() {
-			bit = 1
+func (si *BinaryStdIn) ReadAndWrite() (c chan bool) {
+	c = make(chan bool)
+	chAmount := 0 // 文件 bit 大小
+	go func() {
+
+		for {
+			ch := si.ReadChar() // byte
+			if si.err != nil {  // 读取到文件结尾了
+				fmt.Println("文件bit: ", chAmount)
+				close(c)
+				break
+			}
+			for _, bit := range byteToBit(ch) { // 高位 - 低位
+				c <- bit
+				chAmount += 1
+			}
 		}
-		if si.err != nil {
-			return
-		}
-		fmt.Printf("%b", bit)
-	}
+	}()
+
+	return
 }
 
 
@@ -92,6 +110,7 @@ func (so *BinaryStdOut) WriteBool(bit bool) {
 func (so *BinaryStdOut) WriteChar(b byte) {
 	// 先转换为 []bool
 	so.bitbuff = append(so.bitbuff, byteToBit(b)...)
+
 	so.Flush(false)
 }
 
@@ -108,7 +127,6 @@ func (so *BinaryStdOut) Flush(com bool) {
 			bl += 1
 			buffend = []bool{}
 		}
-		fmt.Println("in flush: ", so.bitbuff)
 		so.fl.Write(bitarrToBytearr(so.bitbuff)) // 实际写入. 如果没有补齐, 这个函数会忽略最后的几位
 		so.bitbuff = buffend
 	}
@@ -219,8 +237,8 @@ func unsignedToBit(a uint64, n int) (bits []bool) {
 // 将超过一个字节的 bit 转换为 []byte 字节流
 func bitarrToBytearr(bits []bool) (b []byte) {
 	b = make([]byte, len(bits)/8) // 转化为多少字节
-	for i:=0; i<len(b); i+=8{
-		b[i/8] = bitToByte(bits[i*8:i*8+8])
+	for i:=0; i<len(b); i+=1{
+		b[i] = bitToByte(bits[i*8:i*8+8])
 	}
 	return
 }

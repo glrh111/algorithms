@@ -6,7 +6,7 @@ import (
 )
 
 /*
-    测试字母表
+    测试 gene 压缩
  */
 
 func TestGene(t *testing.T) {
