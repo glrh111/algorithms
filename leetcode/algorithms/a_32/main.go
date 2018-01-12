@@ -35,34 +35,59 @@ func (s *stack) push(value int) {
 	s.size++
 }
 
+// 返回stk顶部的值，但是不 POP
+func (s *stack) peek() (value int, ok bool) {
+	if s.size != 0 {
+		ok = true
+		value = s.first.value
+	}
+	return
+}
+
+func (s *stack) isEmpty() bool {
+	return s.size == 0
+}
+
+type validParr struct {
+	index int     // 最长串开始的索引
+	longestl int  // 多长？
+}
+
 /*
    再实现功能.
    找出输入字符串中，最长的valid括号
-   FIXME 有待修改。结果不正确。没能处理诸如 "()(()" 的情况
+   FIXME 有待修改。结果不正确。没能处理诸如 "()(()" 的情况. 所以要做第二遍筛查。
+
+   参考了这里边的实现：
+   https://leetcode.com/articles/longest-valid-parentheses/
  */
 func longestValidParentheses(s string) int {
 	var (
 		longestl, longestindex, nowl int
 		stk = newStack()
 	)
-	
+
+	// push -1
+	stk.push(-1)
+
 	for i:=0; i<len(s); i++ {
 
 		switch char := s[i]; char {
 		case '(': // push -> stack
-			stk.push(int(char))
+			stk.push(i)
 		case ')': // 弹出一个
-			c, ok := stk.pop()
-			if ok && c-int(char)==-1 { // 匹配了一对儿括号
-				nowl += 2
+			stk.pop()
+			if stk.isEmpty() { // push i
+				stk.push(i)
+			} else {           // POP 一个出来
+				j, _ := stk.peek() // 然后比较大小
+
+				nowl = i - j   // 最长的
 				if nowl > longestl {
-					longestl = nowl // 这里还得判断一下，TODO 判断括号里边是否有剩余括号。如果有的话，放入缓冲区
+					longestl = nowl
 					longestindex = i
 				}
-			} else { // 看看未闭合的括号的数量有没有变化。
-				nowl = 0
 			}
-
 		default:
 			panic("")
 		}
@@ -73,5 +98,5 @@ func longestValidParentheses(s string) int {
 }
 
 func main() {
-	longestValidParentheses(")()()()(")
+	longestValidParentheses("()(()()")
 }

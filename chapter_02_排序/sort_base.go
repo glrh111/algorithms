@@ -1,89 +1,80 @@
 package main
 
-import "fmt"
+import (
+	"math/rand"
+	"time"
+	"fmt"
+)
 
 /*
  *   Comparable
  */
-
-type IComparable interface {
-	CompareTo(a []IComparable )
+// A type, typically a collection, that satisfies sort.Interface can be
+// sorted by the routines in this package. The methods require that the
+// elements of the collection be enumerated by an integer index.
+type Interface interface {
+	// Len is the number of elements in the collection.
+	Len() int
+	// Less reports whether the element with
+	// index i should sort before the element with index j.
+	Less(i, j int) bool
+	// Swap swaps the elements with indexes i and j.
+	Swap(i, j int)
+	// 打乱元素
+	Shuffle()
+	// i < j -1; i == j 0; i > j 1
+	Compare(i, j int) int
+	Show(lo, hi int)
+	// 是否排定顺序
+	IsSorted() bool
 }
 
-type Comparable struct {
-	value int
-}
+// 整数实现的 Interface
+type IntSlice []int
 
-func (b *Comparable) CompareTo(a Comparable) int {
-	if (b.value > a.value) {
-		return 1
-	} else if (b.value == a.value) {
-		return 0
+func (p IntSlice) Len() int           { return len(p) }
+func (p IntSlice) Less(i, j int) bool { return p[i] < p[j] }
+func (p IntSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p IntSlice) Shuffle() { // 瞎 JB 交换
+	l := p.Len()
+	rand.Seed(int64(time.Now().Nanosecond()))
+	for index, randindex := range rand.Perm(l) {
+		if index >= l / 2 { break }
+		p.Swap(index, randindex)
+	}
+}
+func (p IntSlice) Compare(i int, j int) (re int) {
+	if p[i] > p[j] {
+		re = 1
+	} else if p[i] == p[j] {
+		re = 0
 	} else {
-		return -1
+		re = -1
 	}
+	return
+}
+func (p IntSlice) Show(lo int, hi int) {
+	fmt.Println(p[lo:hi+1])
 }
 
-func (b *Comparable) Value() int {
-	return b.value
-}
-
-/*
- *   Sortable
- */
-
-type ISortable interface {
-	Sort()               // return
-	Less(a Comparable, b Comparable) bool // a < b return true
-	Exchange(a int, b int) // 交换位置
-	Show() // 打印出来元素
-	IsSorted() bool // 返回是否排序成功
-}
-
-type Sortable struct {
-	valueList []Comparable
-}
-
-func (this *Sortable) Sort() {
-
-}
-
-func (this *Sortable) Less(a Comparable, b Comparable) bool {
-	if (-1 == a.CompareTo(b)) {
-		return true
-	} else {
-		return false
-	}
-}
-
-func (this *Sortable) Exchange(a int, b int) {
-	this.valueList[a], this.valueList[b] = this.valueList[b], this.valueList[a]
-}
-
-// 打乱元素
-func (this *Sortable) Shuffle() {
-
-}
-
-func (this *Sortable) Show() {
-	for _, value := range this.valueList {
-		fmt.Printf("%d ", value.Value())
-	}
-	fmt.Print("\n")
-}
-
-func (this *Sortable) IsSorted() bool {
-	if (len(this.valueList)>1) {
-		for i:=0; i<len(this.valueList)-1; i++ {
-			if this.Less(this.valueList[i+1], this.valueList[i]) {
-				return false
-			}
+func (p IntSlice) IsSorted() (is bool) {
+	is = true
+	for i:=0; i<p.Len()-1; i++ {
+		if p[i] > p[i+1] {
+			is = false
+			break
 		}
 	}
-	return true
+	return
 }
 
-
-
-
+func generateIntSlice(n int, max int) (p IntSlice) {
+	p = make(IntSlice, n)
+	rand.Seed(int64(time.Now().Nanosecond()))
+	for i:=0; i<n; i++ {
+		p[i] = rand.Intn(max + 1)
+	}
+	p.Shuffle()
+	return
+}
 

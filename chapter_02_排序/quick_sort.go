@@ -2,59 +2,98 @@ package main
 
 import "fmt"
 
-type QuickSort struct {
-	Sortable
+/*
+   快速排序，原地排序
+ */
+func quickSort(data Interface) {
+	_quickSort(data, 0, data.Len()-1)
 }
 
-func (this *QuickSort) Sort() {
-	this.sort(0, len(this.valueList)-1)
-}
-
-// 需要在额外的列表实线。
-func (this *QuickSort) sort(lo int, hi int) {
-	if (lo <= hi) {
+func _quickSort(data Interface, lo int, hi int) {
+	if hi <= lo {
 		return
 	}
-	j := this.partition(lo, hi)
-	this.sort(lo, j-1)
-	this.sort(j+1, hi)
+	j := partition(data, lo, hi)
+	_quickSort(data, lo, j-1)
+	_quickSort(data, j+1, hi)
 }
 
-// 分区用的
-// 将 valueList[j] 放到一个合适的位置。左边的都小于它，右边都大于它。放到一个合适的位置。
-func (this *QuickSort) partition(lo int, hi int) (j int) {
-	i := lo
-	j = hi
+/*
+   切分总是能排定一个元素
+ */
+func partition(data Interface, lo int, hi int) int {
+
+	var i, j = lo, hi + 1
+
 	for {
-		for ; ! this.Less(this.valueList[lo], this.valueList[i]); i++ {
 
+		// i 往后扫描
+		for {
+			i++
+			if data.Less(lo, i) { break }
+			if i == hi {  break }
 		}
-		for ; this.Less(this.valueList[j], this.valueList[lo]); j-- {
 
+		// j 往前扫描
+		for {
+			j--
+			if data.Less(j, lo) { break }
+			if j == lo { break }
 		}
-		if (i > j) {
-			break
-		}
-		this.Exchange(i, j)
+
+		if i >= j { break }
+
+		data.Swap(i, j)
 	}
-	this.Exchange(lo, j)
-	return
+
+	data.Swap(lo, j)
+
+	return j
 }
 
-// 创建新对象用的
-func NewQuickSortInstance(a []int) *QuickSort {
-	var rawSortedList []Comparable
-	for _, value := range a {
-		rawSortedList = append(rawSortedList, Comparable{value})
+/*
+    三向切分快速排序
+ */
+func quickSort3Way(data Interface) {
+	_quickSort3Way(data, 0, data.Len()-1)
+}
+
+func _quickSort3Way(data Interface, lo int, hi int) {
+	if lo >= hi { return }
+	// 切分元素就是 lo
+	var (
+		lt, gt = lo+1, hi // [lt, gt] 之间的元素相等
+		i = lo + 1 // i 为索引指针 lo 为切分元素。
+	)
+
+	for {
+		if i > gt { break }
+		cmp := data.Compare(i, lo)
+		if cmp > 0 {  // i > v 跟gt交换。gt-- i 不变
+			data.Swap(i, gt)
+			gt--
+		} else if cmp == 0 { // 元素留在本地
+			i++
+		} else {             //
+			data.Swap(i, lt)
+			lt++
+			i++
+		}
 	}
-	return &QuickSort{Sortable{rawSortedList}}
+	data.Swap(lo, lt-1)
+	_quickSort3Way(data, lo, lt-1)
+	_quickSort3Way(data, gt+1, hi)
 }
 
 func main() {
-	sortInstance := NewQuickSortInstance([]int{5,4,3,1,1,8})
-	sortInstance.Show()
-	fmt.Print(sortInstance.IsSorted(), "\n")
-	sortInstance.Sort()
-	sortInstance.Show()
-	fmt.Println(sortInstance.IsSorted(), "\n")
+	p := generateIntSlice(1000000, 10)
+	fmt.Println(p.IsSorted())
+
+	quickSort3Way(p)
+	fmt.Println(p.IsSorted())
+
+	p.Shuffle()
+	fmt.Println("After shuffle!")
+	quickSort(p)
 }
+
