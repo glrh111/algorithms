@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+//import "fmt"
 
 /*
    快速排序，原地排序
@@ -85,15 +85,19 @@ func _quickSort3Way(data Interface, lo int, hi int) {
 	_quickSort3Way(data, gt+1, hi)
 }
 
-func main() {
-	p := generateIntSlice(1000000, 10)
-	fmt.Println(p.IsSorted())
-
-	quickSort3Way(p)
-	fmt.Println(p.IsSorted())
-
-	p.Shuffle()
-	fmt.Println("After shuffle!")
-	quickSort(p)
-}
+//func main() {
+//	// quick_sort
+//	p := generateIntSlice(1000000, 10)
+//	fmt.Println(p.IsSorted())
+//
+//	quickSort3Way(p)
+//	fmt.Println(p.IsSorted())
+//
+//	//p.Shuffle()
+//	//fmt.Println("After shuffle!")
+//	//quickSort(p)
+//
+//	// heap
+//
+//}
 
