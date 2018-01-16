@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+//import "fmt"
 
 /*
    选择排序
@@ -43,15 +43,15 @@ func bubbleSort(data Interface, lo int, hi int) {
 	bubbleSort(data, lo, hi-1)
 }
 
-func main() {
-	p := generateIntSlice(100, 10)
-	fmt.Println("选择排序前", p)
-	SelectionSort(p)
-	fmt.Println(p, p.IsSorted())
-
-	p.Shuffle()
-	fmt.Println("冒泡排序前：", p)
-	BubbleSort(p)
-	fmt.Println(p, p.IsSorted())
-}
+//func main() {
+//	p := generateIntSlice(100, 10)
+//	fmt.Println("选择排序前", p)
+//	SelectionSort(p)
+//	fmt.Println(p, p.IsSorted())
+//
+//	p.Shuffle()
+//	fmt.Println("冒泡排序前：", p)
+//	BubbleSort(p)
+//	fmt.Println(p, p.IsSorted())
+//}
 
