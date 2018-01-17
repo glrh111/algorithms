@@ -105,6 +105,14 @@ func main() {
 
 ```
 
+## python 遇到的问题汇总
+
+### 1. 递归嵌套深度
+
+```python
+sys.setrecursionlimit(1000000)
+```
+
 ## git
 
 ### 1 删除敏感数据
